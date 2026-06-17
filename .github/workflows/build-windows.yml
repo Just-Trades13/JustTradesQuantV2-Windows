@@ -1,11 +1,14 @@
 name: Build Windows EXE
 
-# Build the standalone Windows .exe on GitHub's Windows runners.
-# Trigger manually from the Actions tab, or on every push to main.
+# Build the standalone Windows .exe on GitHub's Windows runners and
+# publish it as a Release asset (downloadable by anyone, no login).
 on:
   workflow_dispatch:
   push:
     branches: [main]
+
+permissions:
+  contents: write   # needed to create/update the Release
 
 jobs:
   build:
@@ -29,9 +32,23 @@ jobs:
       - name: Build EXE
         run: pyinstaller JustTradesQuant.spec --noconfirm
 
-      - name: Upload artifact
+      - name: Zip the build
+        run: Compress-Archive -Path dist/JustTradesQuantV2/* -DestinationPath JustTradesQuantV2-Windows.zip -Force
+        shell: pwsh
+
+      - name: Upload build artifact
         uses: actions/upload-artifact@v4
         with:
           name: JustTradesQuantV2-Windows
-          path: dist/JustTradesQuantV2
+          path: JustTradesQuantV2-Windows.zip
           if-no-files-found: error
+
+      - name: Publish Release (public download link)
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: latest
+          name: Just Trades Quant V2 (Windows)
+          body: |
+            Standalone Windows build. Download the zip below, unzip it, and
+            double-click **JustTradesQuantV2.exe**. No Python or install needed.
+          files: JustTradesQuantV2-Windows.zip
