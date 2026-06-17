@@ -1,0 +1,10 @@
+# Build / Python artifacts
+build/
+dist/
+*.spec.bak
+__pycache__/
+*.pyc
+venv/
+.venv/
+*.bak
+.DS_Store
