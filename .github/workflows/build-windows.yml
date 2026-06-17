@@ -27,9 +27,12 @@ jobs:
         run: |
           python -m pip install --upgrade pip
           pip install -r requirements.txt
-          pip install pyinstaller
+          pip install "setuptools<71" wheel
+          pip install "pyinstaller==6.11.1"
 
       - name: Build EXE
+        env:
+          SETUPTOOLS_USE_DISTUTILS: stdlib
         run: pyinstaller JustTradesQuant.spec --noconfirm
 
       - name: Zip the build
